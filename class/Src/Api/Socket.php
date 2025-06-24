@@ -106,7 +106,8 @@ class Socket
                 "member_id" => $decoded_message["messageInfos"]["sender"],
                 "name" => $decoded_message["authorName"] . " " . $decoded_message["authorSurname"],
                 "connection" => $sock,
-                "listening" => ""
+                "listening" => "",
+                "group" => ""
               ];
 
               break;
@@ -118,12 +119,25 @@ class Socket
               $decoded_message["authorMessage"]["messageText"] = htmlspecialchars($decoded_message["authorMessage"]["messageText"] ?? '');
 
               foreach ($this->members as $mkey => $mvalue) {
-                if ($mvalue["member_id"] != $decoded_message["messageInfos"]["sender"]) {
-                  if ($mvalue["member_id"] === $decoded_message["messageInfos"]["target"]) {
+                if ($decoded_message["messageInfos"]["sender"] != $mvalue["member_id"]) {
+
+                  // TODO voir pourquoi le serveur socket ne transmet pas les messages uniquement aux utilisateurs actuellement sur le salon ciblé
+                  // if ($decoded_message["messageInfos"]["isForGroup"]) {
+
+                  //   if ($this->members[$mkey]["listening"] === $decoded_message["messageInfos"]["target"] && $this->members[$mkey]["isForGroup"] == $decoded_message["messageInfos"]["isForGroup"]) {
+
+                  //     socket_write($mvalue["connection"], $masked_message, strlen($masked_message));
+                  //   }
+
+                  // } else {
+
+                  if ($decoded_message["messageInfos"]["target"] === $mvalue["member_id"]) {
                     if ($this->members[$key]["member_id"] === $this->members[$mkey]["listening"]) {
                       socket_write($mvalue["connection"], $masked_message, strlen($masked_message));
                     }
                   }
+
+                  // }
                 }
               }
 
@@ -132,7 +146,13 @@ class Socket
             case "switch":
 
               $this->members[$key]["listening"] = $decoded_message["messageInfos"]["target"];
-              echo "Profile " . $this->members[$key]["member_id"] . " parle à Profile " . $this->members[$key]["listening"] . "\n";
+              $this->members[$key]["group"] = $decoded_message["messageInfos"]["isForGroup"];
+
+              if ($this->members[$key]["group"] != false) {
+                echo "Profile " . $this->members[$key]["member_id"] . " écoute Groupe " . $this->members[$key]["group"] . ", salon " . $this->members[$key]["listening"] . "\n";
+              } else {
+                echo "Profile " . $this->members[$key]["member_id"] . " écoute Profile " . $this->members[$key]["listening"] . "\n";
+              }
 
               break;
 
