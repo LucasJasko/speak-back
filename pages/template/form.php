@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/../css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <link rel="shortcut icon" href="/../assets/img/Speak_32x32.png" type="image/x-icon">
   <title>Tableau de bord - Formulaire de modification</title>
 </head>
 
@@ -17,7 +18,6 @@
 
 
     <form class="form" action="/<?= $metaInfos["redirect_page"] ?>" method="post" enctype="multipart/form-data">
-
 
       <a class="return-link" href="/<?= $metaInfos["return_page"] ?>"><i class="fa-solid fa-arrow-left"></i></a>
 
@@ -135,32 +135,45 @@
             }
           } else {
             if (str_contains("group_id", $dataField) && isset($fieldsInfos["form_fields"]["room_name"])) {
-
               ?>
               <input type='<?= $inputType ?>' name="<?= $dataField ?>" id="<?= $dataField ?>"
                 value="<?= $groupName["group_name"] ?>" disabled <?= $attributes ?>>
               <input type='<?= $inputType ?>' name="<?= $dataField ?>" id="<?= $dataField ?>" value="<?= $linkedId ?>" hidden
                 <?= $attributes ?>>
 
-            <?php } else { ?>
-              <select name="<?= $dataField ?>">
+            <?php } else {
 
-                <?php
-                $options = \Src\Model\Form::getDataOfTable(str_replace("_id", "", $dataField));
+              $options = \Src\Model\Form::getDataOfTable(str_replace("_id", "", $dataField));
 
+              if ($dataField == "group_id" && array_key_exists("room_id", $fieldsInfos)) {
                 for ($i = 0; $i < count($options); $i++) {
+                  if ($options[$i]["group_id"] == $metaInfos["linked_id"]) { ?>
 
-                  $fieldName = str_replace("_id", "_name", $dataField);
-                  ?>
+                    <input type='<?= $inputType ?>' value="<?= $options[$i]["group_name"] ?>" readonly>
+                    <input type='<?= $inputType ?>' name="<?= $dataField ?>" id="<?= $dataField ?>"
+                      value="<?= $options[$i]["group_id"] ?>" required hidden>
 
-                  <option value="<?= $options[$i][$dataField] ?>" <?= $options[$i][$fieldName] == $displayedData[$dataField] ? "selected" : "" ?>>
-                    <?= $options[$i][$fieldName] ?>
-                  </option>
+                  <?php }
+                }
+              } else { ?>
+                <select name="<?= $dataField ?>">
 
-                <?php } ?>
+                  <?php
 
-              </select>
-            <?php }
+                  for ($i = 0; $i < count($options); $i++) {
+
+                    $fieldName = str_replace("_id", "_name", $dataField);
+                    ?>
+
+                    <option value="<?= $options[$i][$dataField] ?>" <?= $options[$i][$fieldName] == $displayedData[$dataField] ? "selected" : "" ?>>
+                      <?= $options[$i][$fieldName] ?>
+                    </option>
+
+                  <?php } ?>
+
+                </select>
+              <?php }
+            }
           }
         }
       }

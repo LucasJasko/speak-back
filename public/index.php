@@ -102,6 +102,11 @@ Router::add("/key", function ($isApi = false) {
   $controller->dispatch($isApi);
 });
 
+Router::add("/rooms", function ($isApi = false) {
+  $controller = new \Src\Api\Room();
+  $controller->dispatch($isApi);
+});
+
 Router::add("/chat/{action}", function ($action, $isApi = false) {
   $controller = new \Src\Api\Chat();
   $controller->dispatch($action, $isApi);

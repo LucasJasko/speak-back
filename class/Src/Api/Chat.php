@@ -80,60 +80,62 @@ class Chat
 
           $infos = App::getApiData();
 
-          if ($res = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $infos["target"], "profile_id_B", $infos["origin"])) {
+          if (isset($infos["target"]) & isset($infos["origin"])) {
 
-            $dmId = $res[0]["dm_id"];
-            $messageIds = App::db()->getFieldsWhere("message__dm", ["message_id"], "dm_id", $dmId);
-            $targetFullName = App::db()->getFieldsWhere("profile", ["profile_name", "profile_surname", "profile_picture"], "profile_id", $infos["target"])[0];
-            $originFullName = App::db()->getFieldsWhere("profile", ["profile_name", "profile_surname", "profile_picture"], "profile_id", $infos["origin"])[0];
+            if ($res = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $infos["target"], "profile_id_B", $infos["origin"])) {
 
-            if (!empty($messageIds)) {
+              $dmId = $res[0]["dm_id"];
+              $messageIds = App::db()->getFieldsWhere("message__dm", ["message_id"], "dm_id", $dmId);
+              $targetFullName = App::db()->getFieldsWhere("profile", ["profile_name", "profile_surname", "profile_picture"], "profile_id", $infos["target"])[0];
+              $originFullName = App::db()->getFieldsWhere("profile", ["profile_name", "profile_surname", "profile_picture"], "profile_id", $infos["origin"])[0];
 
-              $idList = [];
+              if (!empty($messageIds)) {
 
-              for ($i = 0; $i < count($messageIds); $i++) {
-                $idList[$i] = $messageIds[$i]["message_id"];
-              }
+                $idList = [];
 
-              $feed = App::db()->getAllWhereOr("message", "message_id", $idList);
-
-              if ($feed) {
-
-                for ($i = 0; $i < count($feed); $i++) {
-
-                  $clearedMessage = [];
-                  foreach ($feed[$i] as $key => $value) {
-                    $newKey = str_replace("message_", "", $key);
-                    $clearedMessage[$newKey] = $value;
-                  }
-
-
-                  if ($clearedMessage["profile_id"] == $infos["target"]) {
-
-                    $path = ROOT . "/upload/profile/" . $infos["target"] . "-speak-profile-" . strtolower($targetFullName["profile_surname"]) . "-" . strtolower($targetFullName["profile_name"]) . "/profile_picture/" . $targetFullName["profile_picture"];
-
-                    $clearedMessage["author_picture"] = base64_encode(file_get_contents($path));
-                    $clearedMessage["author_name"] = $targetFullName["profile_name"];
-                    $clearedMessage["author_surname"] = $targetFullName["profile_surname"];
-                  } else {
-
-                    $path = ROOT . "/upload/profile/" . $infos["origin"] . "-speak-profile-" . strtolower($originFullName["profile_surname"]) . "-" . strtolower($originFullName["profile_name"]) . "/profile_picture/" . $originFullName["profile_picture"];
-
-                    $clearedMessage["author_picture"] = base64_encode(file_get_contents($path));
-                    $clearedMessage["author_name"] = $originFullName["profile_name"];
-                    $clearedMessage["author_surname"] = $originFullName["profile_surname"];
-                  }
-
-                  $feed[$i] = $clearedMessage;
+                for ($i = 0; $i < count($messageIds); $i++) {
+                  $idList[$i] = $messageIds[$i]["message_id"];
                 }
 
-                App::sendApiData($feed);
+                $feed = App::db()->getAllWhereOr("message", "message_id", $idList);
+
+                if ($feed) {
+
+                  for ($i = 0; $i < count($feed); $i++) {
+
+                    $clearedMessage = [];
+                    foreach ($feed[$i] as $key => $value) {
+                      $newKey = str_replace("message_", "", $key);
+                      $clearedMessage[$newKey] = $value;
+                    }
+
+
+                    if ($clearedMessage["profile_id"] == $infos["target"]) {
+
+                      $path = ROOT . "/upload/profile/" . $infos["target"] . "-speak-profile-" . strtolower($targetFullName["profile_surname"]) . "-" . strtolower($targetFullName["profile_name"]) . "/profile_picture/" . $targetFullName["profile_picture"];
+
+                      $clearedMessage["author_picture"] = base64_encode(file_get_contents($path));
+                      $clearedMessage["author_name"] = $targetFullName["profile_name"];
+                      $clearedMessage["author_surname"] = $targetFullName["profile_surname"];
+                    } else {
+
+                      $path = ROOT . "/upload/profile/" . $infos["origin"] . "-speak-profile-" . strtolower($originFullName["profile_surname"]) . "-" . strtolower($originFullName["profile_name"]) . "/profile_picture/" . $originFullName["profile_picture"];
+
+                      $clearedMessage["author_picture"] = base64_encode(file_get_contents($path));
+                      $clearedMessage["author_name"] = $originFullName["profile_name"];
+                      $clearedMessage["author_surname"] = $originFullName["profile_surname"];
+                    }
+
+                    $feed[$i] = $clearedMessage;
+                  }
+
+                  App::sendApiData($feed);
+                }
+
+              } else {
+                App::sendApiData([]);
               }
-
-            } else {
-              App::sendApiData([]);
             }
-
           }
 
           break;
