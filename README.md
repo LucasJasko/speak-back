@@ -6,6 +6,14 @@ Pour fonctionner ce projet doit avoir un serveur apache avec les modules suivant
 
 - Headers_module
 - Rewrite_module
+- ssl_module modules/mod_ssl.so
+
+- Include conf/extra/httpd-ssl.conf
+
+le virtualhost doit inclure:
+SSLEngine on
+SSLCertificateFile "${SRVROOT}/conf/key/server.crt"
+SSLCertificateKeyFile "${SRVROOT}/conf/key/server.key"
 
 et la directive suivante activé dans le httpd.conf :
 
