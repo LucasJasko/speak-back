@@ -10,7 +10,7 @@ Pour fonctionner ce projet doit avoir un serveur apache avec les modules suivant
 
 - Include conf/extra/httpd-ssl.conf
 
-le virtualhost doit inclure:
+le virtualhost doit inclure (pas obligatoire car configuration pas au point pour l'instant):
 SSLEngine on
 SSLCertificateFile "${SRVROOT}/conf/key/server.crt"
 SSLCertificateKeyFile "${SRVROOT}/conf/key/server.key"
