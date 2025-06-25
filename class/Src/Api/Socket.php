@@ -78,6 +78,7 @@ class Socket
   {
     foreach ($reads as $key => $sock) {
 
+      // On ne renvoie rien au serveur lui même
       if ($sock === $this->socketServer) {
         continue;
       }
@@ -106,7 +107,7 @@ class Socket
                 "member_id" => $decoded_message["messageInfos"]["sender"],
                 "name" => $decoded_message["authorName"] . " " . $decoded_message["authorSurname"],
                 "connection" => $sock,
-                "listening" => "",
+                "listening" => $decoded_message["messageInfos"]["target"],
                 "group" => ""
               ];
 
@@ -116,28 +117,20 @@ class Socket
 
               $masked_message = $this->pack_data($message);
 
+
               $decoded_message["authorMessage"]["messageText"] = htmlspecialchars($decoded_message["authorMessage"]["messageText"] ?? '');
 
               foreach ($this->members as $mkey => $mvalue) {
+                // Si le membre n'est pas l'expéditeur du message
                 if ($decoded_message["messageInfos"]["sender"] != $mvalue["member_id"]) {
-
-                  // TODO voir pourquoi le serveur socket ne transmet pas les messages uniquement aux utilisateurs actuellement sur le salon ciblé
-                  // if ($decoded_message["messageInfos"]["isForGroup"]) {
-
-                  //   if ($this->members[$mkey]["listening"] === $decoded_message["messageInfos"]["target"] && $this->members[$mkey]["isForGroup"] == $decoded_message["messageInfos"]["isForGroup"]) {
-
-                  //     socket_write($mvalue["connection"], $masked_message, strlen($masked_message));
-                  //   }
-
-                  // } else {
-
+                  // Si le membre est bien le destinataire du message
                   if ($decoded_message["messageInfos"]["target"] === $mvalue["member_id"]) {
-                    if ($this->members[$key]["member_id"] === $this->members[$mkey]["listening"]) {
+                    // Si le membre destinataire est bien en train d'écouter l'expéditeur
+                    if ($mvalue["listening"] === $this->members[$key]["member_id"]) {
                       socket_write($mvalue["connection"], $masked_message, strlen($masked_message));
                     }
-                  }
 
-                  // }
+                  }
                 }
               }
 
@@ -148,11 +141,11 @@ class Socket
               $this->members[$key]["listening"] = $decoded_message["messageInfos"]["target"];
               $this->members[$key]["group"] = $decoded_message["messageInfos"]["isForGroup"];
 
-              if ($this->members[$key]["group"] != false) {
-                echo "Profile " . $this->members[$key]["member_id"] . " écoute Groupe " . $this->members[$key]["group"] . ", salon " . $this->members[$key]["listening"] . "\n";
-              } else {
-                echo "Profile " . $this->members[$key]["member_id"] . " écoute Profile " . $this->members[$key]["listening"] . "\n";
-              }
+              // if ($this->members[$key]["group"] != false) {
+              //   echo "Profile " . $this->members[$key]["member_id"] . " écoute Groupe " . $this->members[$key]["group"] . ", salon " . $this->members[$key]["listening"] . "\n";
+              // } else {
+              echo "Profile " . $this->members[$key]["member_id"] . " écoute Profile " . $this->members[$key]["listening"] . "\n";
+              // }
 
               break;
 
