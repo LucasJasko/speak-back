@@ -19,6 +19,10 @@ et la directive suivante activé dans le httpd.conf pour obtenir la variable "RE
 
 - HostnameLookups On
 
+Pour CRUD des fichiers dans le projet, le serveur apache doit avoir les droits pour le faire dans le dossier contenant le projet. Pour se faire, sous fedora la commande est:
+
+- sudo setfacl -R -d -m u:apache:rwx /chemin/vers/le/projet
+
 Il nécessite aussi les programmes tiers suivant:
 
 - Composer
