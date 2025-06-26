@@ -47,11 +47,7 @@ class Database
     }
     $sql .= ") VALUES ( ";
     foreach ($fields as $value) {
-      if (str_contains($value, "_creation_time")) {
-        $sql .= "NOW(), ";
-      } else {
-        $sql .= ":" . $value . ", ";
-      }
+      $sql .= ":" . $value . ", ";
     }
     $sql .= ")";
     $sql = str_replace(", ) VALUES", " ) VALUES", $sql);
@@ -60,7 +56,7 @@ class Database
     $stmt = $this->db->prepare($sql);
 
     foreach ($data as $key => $value) {
-      if (!str_contains($key, "_creation_time")) {
+      if ($key != $table . "_id") {
         $stmt->bindValue(":" . $key, $value);
       }
     }

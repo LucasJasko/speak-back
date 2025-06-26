@@ -15,7 +15,7 @@ SSLEngine on
 SSLCertificateFile "${SRVROOT}/conf/key/server.crt"
 SSLCertificateKeyFile "${SRVROOT}/conf/key/server.key"
 
-et la directive suivante activé dans le httpd.conf :
+et la directive suivante activé dans le httpd.conf pour obtenir la variable "REMOTE_HOST" dans la variable serveur:
 
 - HostnameLookups On
 

@@ -37,8 +37,8 @@ class Token extends \Src\Model\Model
   {
     $this->createNewModel("token", [
       "token_value" => $refreshToken,
-      "token_expiration_time" => time() + 2592000, // 30 jours
-      "token_creation_time" => time(),
+      "token_expiration_time" => date('Y-m-d H:i:s', time() + 2592000), // 30 jours
+      "token_creation_time" => date('Y-m-d H:i:s', time()),
       "token_user_agent" => password_hash($_SERVER["HTTP_USER_AGENT"], PASSWORD_DEFAULT),
       "token_remote_host" => password_hash($_SERVER["REMOTE_HOST"], PASSWORD_DEFAULT),
       "profile_id" => $id

@@ -22,9 +22,13 @@ abstract class Model
     $fields = $this->db->getFieldsOfTable($table);
 
     foreach ($fields as $key => $value) {
+      if (str_contains($value, $this->tableName . "_id")) {
+        unset($fields[$key]);
+      }
       if (!isset($data[$value]))
         $data[$value] = "";
     }
+
     return $this->db->createOne($this->tableName, $data, $fields);
   }
 
