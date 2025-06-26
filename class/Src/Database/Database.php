@@ -40,6 +40,30 @@ class Database extends \Core\Database\Database
     $stmt->execute();
   }
 
+  public function get50Messages(string $field, array $value, $offset)
+  {
+    $sql = "SELECT * FROM `message` WHERE ";
+
+    for ($i = 0; $i < count($value); $i++) {
+      if ($i < count($value) - 1) {
+        $sql .= "$field = :" . $field . "_" . $i . " OR ";
+      } else {
+        $sql .= "$field = :" . $field . "_" . $i;
+      }
+    }
+
+    $sql .= " ORDER BY `message_id` ASC LIMIT 50 OFFSET " . $offset;
+
+    $stmt = $this->db->prepare($sql);
+
+    for ($i = 0; $i < count($value); $i++) {
+      $stmt->bindValue(":" . $field . "_" . $i, $value[$i]);
+    }
+
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
   // TODO méthod dédiée à la recherche de discussion privé existantes
   public function getDmBetweeenAandB(string $table, string $field1, string $field1Value, string $field2, string $field2Value)
   {

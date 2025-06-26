@@ -97,7 +97,7 @@ class Chat
                   $idList[$i] = $messageIds[$i]["message_id"];
                 }
 
-                $feed = App::db()->getAllWhereOr("message", "message_id", $idList);
+                $feed = App::db()->get50Messages("message_id", $idList, 0);
 
                 if ($feed) {
 
@@ -107,23 +107,6 @@ class Chat
                     foreach ($feed[$i] as $key => $value) {
                       $newKey = str_replace("message_", "", $key);
                       $clearedMessage[$newKey] = $value;
-                    }
-
-
-                    if ($clearedMessage["profile_id"] == $infos["target"]) {
-
-                      $path = ROOT . "/upload/profile/" . $infos["target"] . "-speak-profile-" . strtolower($targetFullName["profile_surname"]) . "-" . strtolower($targetFullName["profile_name"]) . "/profile_picture/" . $targetFullName["profile_picture"];
-
-                      $clearedMessage["author_picture"] = base64_encode(file_get_contents($path));
-                      $clearedMessage["author_name"] = $targetFullName["profile_name"];
-                      $clearedMessage["author_surname"] = $targetFullName["profile_surname"];
-                    } else {
-
-                      $path = ROOT . "/upload/profile/" . $infos["origin"] . "-speak-profile-" . strtolower($originFullName["profile_surname"]) . "-" . strtolower($originFullName["profile_name"]) . "/profile_picture/" . $originFullName["profile_picture"];
-
-                      $clearedMessage["author_picture"] = base64_encode(file_get_contents($path));
-                      $clearedMessage["author_name"] = $originFullName["profile_name"];
-                      $clearedMessage["author_surname"] = $originFullName["profile_surname"];
                     }
 
                     $feed[$i] = $clearedMessage;
