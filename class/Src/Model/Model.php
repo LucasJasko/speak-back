@@ -23,10 +23,14 @@ abstract class Model
 
     foreach ($fields as $key => $value) {
       if (str_contains($value, $this->tableName . "_id")) {
+        unset($data[$key]);
         unset($fields[$key]);
-      }
-      if (!isset($data[$value]))
+      } else if (str_contains($value, $this->tableName . "_delete_time")) {
+        unset($data[$key]);
+        unset($fields[$key]);
+      } else if (!isset($data[$value])) {
         $data[$value] = "";
+      }
     }
 
     return $this->db->createOne($this->tableName, $data, $fields);

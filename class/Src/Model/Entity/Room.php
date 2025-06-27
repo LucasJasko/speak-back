@@ -93,6 +93,7 @@ class Room extends \Src\Model\Model
   {
 
     if (empty($data["room_id"])) {
+      $data["room_creation_time"] = date('Y-m-d H:i:s', time());
       $this->createNewModel("room", $data);
       return;
     }
