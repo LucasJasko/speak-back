@@ -78,6 +78,7 @@ class Profile extends \Src\Controller\Controller
         "language" => $data["language_id"],
         "status" => $data["status_id"],
         "name" => $data["profile_name"],
+        "mail" => $data["profile_mail"],
         "surname" => $data["profile_surname"],
         "theme" => $data["theme_id"],
       ];

@@ -110,6 +110,11 @@ Router::add("/rooms", function ($isApi = false) {
   $controller->dispatch($isApi);
 });
 
+Router::add("/edit-profile", function ($isApi = false) {
+  $controller = new \Src\Api\EditProfile();
+  $controller->dispatch($isApi);
+});
+
 Router::add("/chat/{action}", function ($action, $isApi = false) {
   $controller = new \Src\Api\Chat();
   $controller->dispatch($action, $isApi);

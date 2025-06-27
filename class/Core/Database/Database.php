@@ -78,7 +78,7 @@ class Database
       $stmt->bindValue(":" . $key, $value);
     }
     $stmt->bindValue(":" . $param, $id);
-    $stmt->execute();
+    return $stmt->execute();
   }
 
   public function getAll(string $table)
