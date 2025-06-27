@@ -138,7 +138,7 @@ class Chat
             $dbMessage = [
               "message_file" => $file,
               "message_content" => $text,
-              "message_creation_time" => "",
+              "message_creation_time" => date('Y-m-d H:i:s', time()),
               "profile_id" => intval($sender),
             ];
 
