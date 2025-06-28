@@ -8,7 +8,7 @@ class Socket
   private array $connections;
   private array $members;
   private string $address = "0.0.0.0";
-  private int $port = 8060;
+  private int $port = 8080;
 
   public function dispatch($isApi = false)
   {
@@ -107,8 +107,8 @@ class Socket
                 "member_id" => $decoded_message["messageInfos"]["sender"],
                 "name" => $decoded_message["authorName"] . " " . $decoded_message["authorSurname"],
                 "connection" => $sock,
-                "listening" => $decoded_message["messageInfos"]["target"],
-                "group" => ""
+                "isForGroup" => $decoded_message["messageInfos"]["isForGroup"],
+                "listening" => $decoded_message["messageInfos"]["target"]
               ];
 
               break;
@@ -139,13 +139,13 @@ class Socket
             case "switch":
 
               $this->members[$key]["listening"] = $decoded_message["messageInfos"]["target"];
-              $this->members[$key]["group"] = $decoded_message["messageInfos"]["isForGroup"];
+              $this->members[$key]["isForGroup"] = $decoded_message["messageInfos"]["isForGroup"];
 
-              // if ($this->members[$key]["group"] != false) {
-              //   echo "Profile " . $this->members[$key]["member_id"] . " écoute Groupe " . $this->members[$key]["group"] . ", salon " . $this->members[$key]["listening"] . "\n";
-              // } else {
-              echo "Profile " . $this->members[$key]["member_id"] . " écoute Profile " . $this->members[$key]["listening"] . "\n";
-              // }
+              if ($this->members[$key]["isForGroup"]) {
+                echo "Profile " . $this->members[$key]["member_id"] . " écoute Salon " . $this->members[$key]["listening"] . "\n";
+              } else {
+                echo "Profile " . $this->members[$key]["member_id"] . " écoute Profile " . $this->members[$key]["listening"] . "\n";
+              }
 
               break;
 
