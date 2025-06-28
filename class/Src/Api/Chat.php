@@ -82,17 +82,13 @@ class Chat
 
           if (isset($infos["target"]) & isset($infos["origin"])) {
 
-            if ($res = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $infos["target"], "profile_id_B", $infos["origin"])) {
+            if ($dmId = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $infos["target"], "profile_id_B", $infos["origin"])[0]["dm_id"]) {
 
-              $dmId = $res[0]["dm_id"];
               $messageIds = App::db()->getFieldsWhere("message__dm", ["message_id"], "dm_id", $dmId);
-              $targetFullName = App::db()->getFieldsWhere("profile", ["profile_name", "profile_surname", "profile_picture"], "profile_id", $infos["target"])[0];
-              $originFullName = App::db()->getFieldsWhere("profile", ["profile_name", "profile_surname", "profile_picture"], "profile_id", $infos["origin"])[0];
 
               if (!empty($messageIds)) {
 
                 $idList = [];
-
                 for ($i = 0; $i < count($messageIds); $i++) {
                   $idList[$i] = $messageIds[$i]["message_id"];
                 }
@@ -103,16 +99,26 @@ class Chat
 
                   for ($i = 0; $i < count($feed); $i++) {
 
-                    $clearedMessage = [];
-                    foreach ($feed[$i] as $key => $value) {
-                      $newKey = str_replace("message_", "", $key);
-                      $clearedMessage[$newKey] = $value;
-                    }
+                    $clearedMessage = [
+                      "messageHeaders" => [
+                        "isForGroup" => false,
+                        "date" => $feed[$i]["message_creation_time"],
+                        "type" => "message",
+                        "sender" => $feed[$i]["profile_id"],
+                        "target" => $feed[$i]["profile_id"] == intval($infos["origin"]) ? intval($infos["target"]) : intval($infos["origin"]),
+                      ],
+                      "messageBody" => [
+                        "text" => $feed[$i]["message_content"],
+                      ]
+                    ];
 
                     $feed[$i] = $clearedMessage;
                   }
 
                   App::sendApiData($feed);
+
+                } else {
+                  App::sendApiData([]);
                 }
 
               } else {
