@@ -78,6 +78,7 @@ class Database
       $stmt->bindValue(":" . $key, $value);
     }
     $stmt->bindValue(":" . $param, $id);
+
     return $stmt->execute();
   }
 

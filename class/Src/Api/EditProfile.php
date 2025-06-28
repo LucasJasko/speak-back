@@ -33,10 +33,34 @@ class EditProfile
               } else {
                 App::sendApiData(403);
               }
+            } else {
+              App::sendApiData(403);
             }
 
             break;
+
+          case "password":
+
+            if ($req["oldPwd"] && $pwd = App::db()->getFieldWhere("profile", "profile_password", "profile_id", $req["id"])["profile_password"]) {
+
+              if (password_verify($req["oldPwd"], $pwd)) {
+                if (App::db()->updateOne("profile", ["profile_password" => password_hash($req["newPwd"], PASSWORD_DEFAULT)], "profile_id", $req["id"])) {
+                  App::sendApiData(200);
+                } else {
+                  App::sendApiData(500);
+                }
+              } else {
+                App::sendApiData(403);
+              }
+            } else {
+              App::sendApiData(403);
+            }
+
+
+            break;
         }
+      } else {
+        http_response_code(400);
       }
 
     }
