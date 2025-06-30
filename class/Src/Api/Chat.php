@@ -189,17 +189,31 @@ class Chat
 
           $message = App::getApiData()["pendingMessage"];
 
-          if ($message["messageHeaders"]["isForGroup"]) {
+          if ($message["messageHeaders"]["target"] != "0") {
 
-            App::sendApiData("c'est pour un groupe");
+            $target = $message["messageHeaders"]["target"];
+            $sender = $message["messageHeaders"]["sender"];
+            $file = isset($message["messageBody"]["file"]["name"]) ? htmlspecialchars($message["messageBody"]["file"]["name"]) : "";
+            $text = isset($message["messageBody"]["text"]) ? htmlspecialchars($message["messageBody"]["text"]) : "";
 
-          } else {
-            if ($message["messageHeaders"]["target"] != "0") {
+            if ($message["messageHeaders"]["isForGroup"]) {
 
-              $target = $message["messageHeaders"]["target"];
-              $sender = $message["messageHeaders"]["sender"];
-              $file = isset($message["messageBody"]["file"]["name"]) ? htmlspecialchars($message["messageBody"]["file"]["name"]) : "";
-              $text = isset($message["messageBody"]["text"]) ? htmlspecialchars($message["messageBody"]["text"]) : "";
+              $roomId = App::db()->getFieldWhere("room", "room_id", "room_id", $target)["room_id"];
+
+              $dbMessage = [
+                "message_file" => $file,
+                "message_content" => $text,
+                "message_creation_time" => date('Y-m-d H:i:s', time()),
+                "room_id" => intval($sender),
+              ];
+
+              $lastInsertId = App::db()->createOne("message", $dbMessage, ["message_file", "message_content", "message_creation_time", "room_id"]);
+
+              App::db()->createOne("message__room", ["message_id" => $lastInsertId, "room_id" => strval($roomId)], ["message_id", "room_id"]);
+
+              App::sendApiData("success");
+            } else {
+
               $dmId = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $target, "profile_id_B", $sender)[0]["dm_id"];
 
               $dbMessage = [
@@ -214,9 +228,10 @@ class Chat
               App::db()->createOne("message__dm", ["message_id" => $lastInsertId, "dm_id" => strval($dmId)], ["message_id", "dm_id"]);
 
               App::sendApiData("success");
-            } else {
-              App::sendApiData("fail");
             }
+
+          } else {
+            App::sendApiData("fail");
           }
 
           break;
