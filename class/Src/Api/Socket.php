@@ -8,7 +8,7 @@ class Socket
   private array $connections;
   private array $members;
   private string $address = "0.0.0.0";
-  private int $port = 8080;
+  private int $port = 8061;
 
   public function dispatch($isApi = false)
   {
@@ -93,9 +93,9 @@ class Socket
 
         // TODO TRES IMPORTANT !! ajouter + de vérification du format de message avant envoie (pour éviter les éventuelles modifications intermédiaires donc htmlspecialchars sur les champs modifiables)
 
-        if ($decoded_message && isset($decoded_message["messageInfos"]["type"])) {
+        if ($decoded_message && isset($decoded_message["messageHeaders"]["type"])) {
 
-          $type = $decoded_message["messageInfos"]["type"];
+          $type = $decoded_message["messageHeaders"]["type"];
 
           switch ($type) {
 
@@ -104,11 +104,10 @@ class Socket
               echo "Client " . $key . " connecté \n";
 
               $this->members[$key] = [
-                "member_id" => $decoded_message["messageInfos"]["sender"],
-                "name" => $decoded_message["authorName"] . " " . $decoded_message["authorSurname"],
+                "member_id" => $decoded_message["messageHeaders"]["sender"],
+                "isForGroup" => $decoded_message["messageHeaders"]["isForGroup"],
+                "listening" => $decoded_message["messageHeaders"]["target"],
                 "connection" => $sock,
-                "isForGroup" => $decoded_message["messageInfos"]["isForGroup"],
-                "listening" => $decoded_message["messageInfos"]["target"]
               ];
 
               break;
@@ -118,13 +117,13 @@ class Socket
               $masked_message = $this->pack_data($message);
 
 
-              $decoded_message["authorMessage"]["messageText"] = htmlspecialchars($decoded_message["authorMessage"]["messageText"] ?? '');
+              $decoded_message["messageBody"]["text"] = htmlspecialchars($decoded_message["messageBody"]["text"] ?? '');
 
               foreach ($this->members as $mkey => $mvalue) {
                 // Si le membre n'est pas l'expéditeur du message
-                if ($decoded_message["messageInfos"]["sender"] != $mvalue["member_id"]) {
+                if ($decoded_message["messageHeaders"]["sender"] != $mvalue["member_id"]) {
                   // Si le membre est bien le destinataire du message
-                  if ($decoded_message["messageInfos"]["target"] === $mvalue["member_id"]) {
+                  if ($decoded_message["messageHeaders"]["target"] === $mvalue["member_id"]) {
                     // Si le membre destinataire est bien en train d'écouter l'expéditeur
                     if ($mvalue["listening"] === $this->members[$key]["member_id"]) {
                       socket_write($mvalue["connection"], $masked_message, strlen($masked_message));
@@ -138,8 +137,8 @@ class Socket
 
             case "switch":
 
-              $this->members[$key]["listening"] = $decoded_message["messageInfos"]["target"];
-              $this->members[$key]["isForGroup"] = $decoded_message["messageInfos"]["isForGroup"];
+              $this->members[$key]["listening"] = $decoded_message["messageHeaders"]["target"];
+              $this->members[$key]["isForGroup"] = $decoded_message["messageHeaders"]["isForGroup"];
 
               if ($this->members[$key]["isForGroup"]) {
                 echo "Profile " . $this->members[$key]["member_id"] . " écoute Salon " . $this->members[$key]["listening"] . "\n";

@@ -133,12 +133,12 @@ class Chat
 
           $message = App::getApiData()["pendingMessage"];
 
-          if ($message["messageInfos"]["target"] != "0") {
+          if ($message["messageHeaders"]["target"] != "0") {
 
-            $target = $message["messageInfos"]["target"];
-            $sender = $message["messageInfos"]["sender"];
-            $file = isset($message["authorMessage"]["messageFile"]["FileName"]) ? htmlspecialchars($message["authorMessage"]["messageFile"]["FileName"]) : "";
-            $text = isset($message["authorMessage"]["messageText"]) ? htmlspecialchars($message["authorMessage"]["messageText"]) : "";
+            $target = $message["messageHeaders"]["target"];
+            $sender = $message["messageHeaders"]["sender"];
+            $file = isset($message["messageBody"]["file"]["name"]) ? htmlspecialchars($message["messageBody"]["file"]["name"]) : "";
+            $text = isset($message["messageBody"]["text"]) ? htmlspecialchars($message["messageBody"]["text"]) : "";
             $dmId = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $target, "profile_id_B", $sender)[0]["dm_id"];
 
             $dbMessage = [
