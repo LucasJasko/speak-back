@@ -82,49 +82,105 @@ class Chat
 
           if (isset($infos["target"]) & isset($infos["origin"])) {
 
-            if ($dmId = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $infos["target"], "profile_id_B", $infos["origin"])[0]["dm_id"]) {
+            if ($infos["isForGroup"]) {
 
-              $messageIds = App::db()->getFieldsWhere("message__dm", ["message_id"], "dm_id", $dmId);
+              if ($roomId = App::db()->getFieldWhere("room", "room_id", "room_id", $infos["target"])["room_id"]) {
 
-              if (!empty($messageIds)) {
+                $messageIds = App::db()->getFieldsWhere("message__room", ["message_id"], "room_id", $roomId);
 
-                $idList = [];
-                for ($i = 0; $i < count($messageIds); $i++) {
-                  $idList[$i] = $messageIds[$i]["message_id"];
-                }
+                if (!empty($messageIds)) {
 
-                $feed = App::db()->get50Messages("message_id", $idList, 0);
-
-                if ($feed) {
-
-                  for ($i = 0; $i < count($feed); $i++) {
-
-                    $clearedMessage = [
-                      "messageHeaders" => [
-                        "isForGroup" => false,
-                        "date" => $feed[$i]["message_creation_time"],
-                        "type" => "message",
-                        "sender" => $feed[$i]["profile_id"],
-                        "target" => $feed[$i]["profile_id"] == intval($infos["origin"]) ? intval($infos["target"]) : intval($infos["origin"]),
-                      ],
-                      "messageBody" => [
-                        "text" => $feed[$i]["message_content"],
-                      ]
-                    ];
-
-                    $feed[$i] = $clearedMessage;
+                  $idList = [];
+                  for ($i = 0; $i < count($messageIds); $i++) {
+                    $idList[$i] = $messageIds[$i]["message_id"];
                   }
 
-                  App::sendApiData($feed);
+                  $feed = App::db()->get50Messages("message_id", $idList, 0);
+
+                  if ($feed) {
+
+                    for ($i = 0; $i < count($feed); $i++) {
+
+                      $clearedMessage = [
+                        "messageHeaders" => [
+                          "isForGroup" => true,
+                          "date" => $feed[$i]["message_creation_time"],
+                          "type" => "message",
+                          "sender" => $feed[$i]["profile_id"],
+                          "target" => $roomId,
+                        ],
+                        "messageBody" => [
+                          "text" => $feed[$i]["message_content"],
+                        ]
+                      ];
+
+                      $feed[$i] = $clearedMessage;
+                    }
+
+                    App::sendApiData($feed);
+
+                  } else {
+                    App::sendApiData([]);
+                  }
 
                 } else {
                   App::sendApiData([]);
                 }
+              } else {
+                App::sendApiData([]);
+              }
 
+
+            } else {
+              if ($res = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $infos["target"], "profile_id_B", $infos["origin"])) {
+
+                $dmId = $res[0]["dm_id"];
+
+                $messageIds = App::db()->getFieldsWhere("message__dm", ["message_id"], "dm_id", $dmId);
+
+                if (!empty($messageIds)) {
+
+                  $idList = [];
+                  for ($i = 0; $i < count($messageIds); $i++) {
+                    $idList[$i] = $messageIds[$i]["message_id"];
+                  }
+
+                  $feed = App::db()->get50Messages("message_id", $idList, 0);
+
+                  if ($feed) {
+
+                    for ($i = 0; $i < count($feed); $i++) {
+
+                      $clearedMessage = [
+                        "messageHeaders" => [
+                          "isForGroup" => false,
+                          "date" => $feed[$i]["message_creation_time"],
+                          "type" => "message",
+                          "sender" => $feed[$i]["profile_id"],
+                          "target" => $feed[$i]["profile_id"] == intval($infos["origin"]) ? intval($infos["target"]) : intval($infos["origin"]),
+                        ],
+                        "messageBody" => [
+                          "text" => $feed[$i]["message_content"],
+                        ]
+                      ];
+
+                      $feed[$i] = $clearedMessage;
+                    }
+
+                    App::sendApiData($feed);
+
+                  } else {
+                    App::sendApiData([]);
+                  }
+
+                } else {
+                  App::sendApiData([]);
+                }
               } else {
                 App::sendApiData([]);
               }
             }
+
           }
 
           break;
@@ -133,28 +189,34 @@ class Chat
 
           $message = App::getApiData()["pendingMessage"];
 
-          if ($message["messageHeaders"]["target"] != "0") {
+          if ($message["messageHeaders"]["isForGroup"]) {
 
-            $target = $message["messageHeaders"]["target"];
-            $sender = $message["messageHeaders"]["sender"];
-            $file = isset($message["messageBody"]["file"]["name"]) ? htmlspecialchars($message["messageBody"]["file"]["name"]) : "";
-            $text = isset($message["messageBody"]["text"]) ? htmlspecialchars($message["messageBody"]["text"]) : "";
-            $dmId = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $target, "profile_id_B", $sender)[0]["dm_id"];
+            App::sendApiData("c'est pour un groupe");
 
-            $dbMessage = [
-              "message_file" => $file,
-              "message_content" => $text,
-              "message_creation_time" => date('Y-m-d H:i:s', time()),
-              "profile_id" => intval($sender),
-            ];
-
-            $lastInsertId = App::db()->createOne("message", $dbMessage, ["message_file", "message_content", "message_creation_time", "profile_id"]);
-
-            App::db()->createOne("message__dm", ["message_id" => $lastInsertId, "dm_id" => strval($dmId)], ["message_id", "dm_id"]);
-
-            App::sendApiData("success");
           } else {
-            App::sendApiData("fail");
+            if ($message["messageHeaders"]["target"] != "0") {
+
+              $target = $message["messageHeaders"]["target"];
+              $sender = $message["messageHeaders"]["sender"];
+              $file = isset($message["messageBody"]["file"]["name"]) ? htmlspecialchars($message["messageBody"]["file"]["name"]) : "";
+              $text = isset($message["messageBody"]["text"]) ? htmlspecialchars($message["messageBody"]["text"]) : "";
+              $dmId = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $target, "profile_id_B", $sender)[0]["dm_id"];
+
+              $dbMessage = [
+                "message_file" => $file,
+                "message_content" => $text,
+                "message_creation_time" => date('Y-m-d H:i:s', time()),
+                "profile_id" => intval($sender),
+              ];
+
+              $lastInsertId = App::db()->createOne("message", $dbMessage, ["message_file", "message_content", "message_creation_time", "profile_id"]);
+
+              App::db()->createOne("message__dm", ["message_id" => $lastInsertId, "dm_id" => strval($dmId)], ["message_id", "dm_id"]);
+
+              App::sendApiData("success");
+            } else {
+              App::sendApiData("fail");
+            }
           }
 
           break;
