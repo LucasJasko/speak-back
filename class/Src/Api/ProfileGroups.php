@@ -4,7 +4,7 @@ namespace Src\Api;
 
 use \Src\App;
 
-class ProfileGroup
+class ProfileGroups
 {
   public function dispatch($id, $isApi = false)
   {
@@ -16,12 +16,11 @@ class ProfileGroup
         exit();
       }
 
-      $db = App::db();
-      $relations = $db->getFieldsWhere("profile__group", ["group_id"], "profile_id", $id);
+      $relations = App::db()->getFieldsWhere("profile__group", ["group_id"], "profile_id", $id);
 
       $res = [];
       for ($i = 0; $i < count($relations); $i++) {
-        $res[] = $db->getMultipleWhere("group", ["group_id", "group_name", "group_picture"], "group_id", $relations[$i]["group_id"]);
+        $res[] = App::db()->getMultipleWhere("group", ["group_id", "group_name", "group_picture"], "group_id", $relations[$i]["group_id"]);
       }
 
       for ($i = 0; $i < count($res); $i++) {

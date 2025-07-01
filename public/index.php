@@ -130,8 +130,13 @@ Router::add("/search/{subject}", function (string $subject, $isApi = false) {
 });
 
 Router::add("/profile-groups/{profile_id}", function ($id, $isApi = false) {
-  $controller = new \Src\Api\ProfileGroup();
+  $controller = new \Src\Api\ProfileGroups();
   $controller->dispatch($id, $isApi);
+});
+
+Router::add("/group-profiles", function ($isApi = false) {
+  $controller = new \Src\Api\GroupProfiles();
+  $controller->dispatch($isApi);
 });
 
 Router::add("/image/{table}/{folder_name}/{subfolder}/{file_name}", function ($table, $folderName, $subfolder, $fileName, $isApi = false) {

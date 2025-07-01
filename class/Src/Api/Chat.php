@@ -196,18 +196,18 @@ class Chat
             $file = isset($message["messageBody"]["file"]["name"]) ? htmlspecialchars($message["messageBody"]["file"]["name"]) : "";
             $text = isset($message["messageBody"]["text"]) ? htmlspecialchars($message["messageBody"]["text"]) : "";
 
+            $dbMessage = [
+              "message_file" => $file,
+              "message_content" => $text,
+              "message_creation_time" => date('Y-m-d H:i:s', time()),
+              "profile_id" => intval($sender),
+            ];
+
             if ($message["messageHeaders"]["isForGroup"]) {
 
               $roomId = App::db()->getFieldWhere("room", "room_id", "room_id", $target)["room_id"];
 
-              $dbMessage = [
-                "message_file" => $file,
-                "message_content" => $text,
-                "message_creation_time" => date('Y-m-d H:i:s', time()),
-                "room_id" => intval($sender),
-              ];
-
-              $lastInsertId = App::db()->createOne("message", $dbMessage, ["message_file", "message_content", "message_creation_time", "room_id"]);
+              $lastInsertId = App::db()->createOne("message", $dbMessage, ["message_file", "message_content", "message_creation_time", "profile_id"]);
 
               App::db()->createOne("message__room", ["message_id" => $lastInsertId, "room_id" => strval($roomId)], ["message_id", "room_id"]);
 
@@ -215,13 +215,6 @@ class Chat
             } else {
 
               $dmId = App::db()->getDmBetweeenAandB("dm", "profile_id_A", $target, "profile_id_B", $sender)[0]["dm_id"];
-
-              $dbMessage = [
-                "message_file" => $file,
-                "message_content" => $text,
-                "message_creation_time" => date('Y-m-d H:i:s', time()),
-                "profile_id" => intval($sender),
-              ];
 
               $lastInsertId = App::db()->createOne("message", $dbMessage, ["message_file", "message_content", "message_creation_time", "profile_id"]);
 
