@@ -18,7 +18,7 @@ abstract class Controller extends \Core\Controller\Controller
     return $clearedRecordset;
   }
 
-  public function getModelsFromRecordset($recordset, $modelName)
+  public function getModelsFromRecordset(array $recordset, string $modelName)
   {
     for ($i = 0; $i < count($recordset); $i++) {
       $id = $recordset[$i];
