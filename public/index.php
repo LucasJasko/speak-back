@@ -1,11 +1,6 @@
 <?php
 
-// header('Content-Type: text/plain');
-
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-
-var_dump($path);
-exit();
 
 require_once "../class/Src/App.php";
 
