@@ -1,6 +1,6 @@
 <?php
 
-define("ROOT", dirname(__DIR__));
+define("ROOT", "var/www/speak-back/public");
 
 define("DB_HOST", "localhost");
 define("DB_NAME", "speak");
