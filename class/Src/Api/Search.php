@@ -11,6 +11,11 @@ class Search
   {
     if ($isApi) {
 
+      if (!\Src\Api\Auth::protect()) {
+        http_response_code(403);
+        exit();
+      }
+
       switch ($subject) {
 
         case "profiles":

@@ -136,6 +136,14 @@ Router::add("/group-profiles", function ($isApi = false) {
   $controller->dispatch($isApi);
 });
 
+Router::add("/status", function ($isApi = false) {
+  (new \Src\Api\Status())->get($isApi);
+});
+
+Router::add("/edit-status", function ($isApi = false) {
+  (new \Src\Api\Status())->put($isApi);
+});
+
 Router::add("/image/{table}/{folder_name}/{subfolder}/{file_name}", function ($table, $folderName, $subfolder, $fileName, $isApi = false) {
   $controller = new \Src\Api\Image();
   $controller->dispatch($table, $folderName, $subfolder, $fileName, $isApi);

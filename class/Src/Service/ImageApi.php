@@ -23,11 +23,9 @@ class ImageApi extends Image
 
       $this->deleteExistingImages($table);
 
-      $firstPart = $table == "profile" ? "-" . strtolower($profileData[$table . "_surname"]) : "";
-      $secondPart = $this->cleanFileName(strtolower($profileData[$table . "_name"]));
-      $filename = "speak-" . $table . $firstPart . "-" . $secondPart;
+      $filename = "speak-" . $table . "-" . $this->id;
 
-      $this->pathFile .= $table . "/" . $this->id . "-" . $filename . "/";
+      $this->pathFile .= $table . "/" . $this->id . "-speak-" . $table . "/";
 
       if (!is_dir($this->pathFile)) {
         mkdir($this->pathFile);
