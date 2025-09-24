@@ -31,9 +31,14 @@ class Status
         exit();
       }
 
-      $id = App::getApiData();
+      $statusId = App::getApiData()["statusId"];
+      $userId = App::getApiData()["id"];
 
-      App::sendApiData($id);
+      if (App::db()->updateOne("profile", ["status_id" => $statusId], "profile_id", $userId)) {
+        App::sendApiData("statut bien modifié");
+      } else {
+        App::sendApiData("échec de la modification du statut");
+      }
 
     }
   }
