@@ -22,9 +22,7 @@ class Socket
     }
 
   }
-
   // TODO créer une méthode de ping, qui vérifie si l'utilisateur est toujours présent, et déconnextion du socket si non
-
   public function lauchSocketServer()
   {
 
@@ -39,7 +37,6 @@ class Socket
     $this->listenForNewConnections($this->socketServer);
 
   }
-
   private function listenForNewConnections($sock)
   {
     $this->members = [];
@@ -57,7 +54,6 @@ class Socket
 
     }
   }
-
   private function acceptNewConnections($sock, $reads)
   {
     if (in_array($sock, $reads, 0)) {
@@ -73,7 +69,6 @@ class Socket
 
     }
   }
-
   private function handleIncomingMessage($reads)
   {
     foreach ($reads as $key => $sock) {
@@ -166,7 +161,6 @@ class Socket
       }
     }
   }
-
   private function unmask($payload)
   {
     // La recommandation RFC6455 stipule qu'un payload doit avoir une longueur de 7 bits, on doit donc effectuer la conversion de 8 à 7.
@@ -190,7 +184,6 @@ class Socket
 
     return $unmasked;
   }
-
   private function pack_data($text)
   {
     // 0x80 = 128, 0x1 = 1, 0x0f = 15
@@ -207,7 +200,6 @@ class Socket
     return $header . $text;
 
   }
-
   private function handshake($request_header, $sock)
   {
     $headers = [];

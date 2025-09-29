@@ -14,7 +14,6 @@ class Image
     $this->imageType = $type;
     $this->pathFile = str_replace("\\", "/", $this->pathFile);
   }
-
   public function createPicture($table, $id = "")
   {
     $this->id = $id != "" ? $id : $_POST[$table . "_id"];
@@ -61,7 +60,6 @@ class Image
     }
 
   }
-
   private function createIMG($table, $filename, $extension)
   {
     $filename = $this->cleanFileName($filename);
@@ -140,7 +138,6 @@ class Image
 
     }
   }
-
   protected function cleanFileName($str)
   {
     $result = strtolower($str);
@@ -151,7 +148,6 @@ class Image
 
     return trim($result, "-");
   }
-
   protected function incrementFileName($filename)
   {
     $is_found = false;
@@ -171,7 +167,6 @@ class Image
     }
     return $filename;
   }
-
   protected function deleteExistingImages($table)
   {
 

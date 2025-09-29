@@ -41,7 +41,6 @@ abstract class Model
     $this->db->updateOne($this->tableName, $newData, $this->searchField, $id);
   }
 
-
   protected function hydrate($row, $table)
   {
     foreach ($row as $key => $value) {
