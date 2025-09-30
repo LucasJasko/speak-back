@@ -15,3 +15,7 @@ Header always set Access-Control-Max-Age: "3600"
 <If "%{REQUEST_URI} =~ m#^/api/#">
 Header always set Content-Type: "application/json"
 </If>
+
+
+
+

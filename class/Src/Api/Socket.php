@@ -22,7 +22,6 @@ class Socket
     }
 
   }
-  // TODO créer une méthode de ping, qui vérifie si l'utilisateur est toujours présent, et déconnextion du socket si non
   public function lauchSocketServer()
   {
 
@@ -227,4 +226,5 @@ class Socket
 
     socket_write($sock, $response_header, strlen($response_header));
   }
+  // TODO créer une méthode de ping qui vérifie la présence de l'utilisateur et le déconnecte en conséquence
 }

@@ -65,6 +65,7 @@ class Database extends \Core\Database\Database
   }
 
   // TODO méthod dédiée à la recherche de discussion privé existantes
+
   public function getDmBetweeenAandB(string $table, string $field1, string $field1Value, string $field2, string $field2Value)
   {
     $stmt = $this->db->prepare("SELECT * FROM `" . $table . "` WHERE (" . $field1 . " = :A AND " . $field2 . " = :B) OR (" . $field2 . " = :A AND " . $field1 . " = :B)");

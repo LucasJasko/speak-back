@@ -7,6 +7,7 @@ require_once "../class/Src/App.php";
 use \Core\Router\Router;
 
 \Src\App::init();
+
 // TODO gérer toute les routes finissant par /
 
 // =================== BACK-OFFICE ROUTES ============================== //
