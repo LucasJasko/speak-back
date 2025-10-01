@@ -10,3 +10,6 @@
 # upload
 /upload/
 !/upload/default/
+
+.vscode
+.vs

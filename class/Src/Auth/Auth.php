@@ -11,7 +11,6 @@ class Auth extends \Core\Auth\Auth
   {
     self::initSession();
 
-    // TODO rajouter des vérification au protect du back office
     if (!isset($_SESSION["auth_key"])) {
       \Src\App::redirect("login");
       exit();
