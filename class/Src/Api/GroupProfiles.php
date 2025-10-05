@@ -52,7 +52,6 @@ class GroupProfiles
               $profiles[$i]["role"] = $profiles[$i]["role_id"];
               $profiles[$i]["language"] = $profiles[$i]["language_id"];
 
-
               unset($profiles[$i]["profile_picture"]);
               unset($profiles[$i]["profile_surname"]);
               unset($profiles[$i]["profile_name"]);

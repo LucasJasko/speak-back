@@ -64,11 +64,6 @@ class Params extends \Src\Controller\Controller
   public function dispatch($tab = null, $id = null, $isApi = false)
   {
 
-    if ($isApi) {
-      // Process API
-      return;
-    }
-
     \Src\Auth\Auth::protect();
 
     if (isset($id) && isset($tab)) {
@@ -83,17 +78,14 @@ class Params extends \Src\Controller\Controller
       }
 
       if ($id != 0) {
-
         $form = new \Src\Model\Form($tab, "params/$tab/$id", $this->formsInfos[$tab]);
         return $form->getForm($model->all(), "Modification: $tab N° $id", "group");
-
       }
-
-      $form = new \Src\Model\Form($tab, "params/$tab/0", $this->formsInfos[$tab]);
 
       $fieldsOfTable = $this->db->getFieldsOfTable($tab);
       $fieldsOfTable = array_fill_keys($fieldsOfTable, "");
 
+      $form = new \Src\Model\Form($tab, "params/$tab/0", $this->formsInfos[$tab]);
       return $form->getEmptyForm($fieldsOfTable, "Création: " . $tab, "params", [$tab . "_id"]);
 
     }
